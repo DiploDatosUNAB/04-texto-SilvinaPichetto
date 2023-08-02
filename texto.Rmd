@@ -9,30 +9,42 @@ knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
 library(datos)
 library(dplyr)
+install.packages(ggforce)
 ```
 
 
 En los siguientes gráficos, agregá título, etiquetas de los ejes y texto alternativo: 
 
 ```{r}
-#' fig.alt: ____
+pinguinos <- datos::pinguinos
+
+#' fig.alt: El siguiente gráfico muestra  la Distribucion de pinguinos segun su especie. Siendo la especie Adelia la más numerosa por arriba de los 150 pinguinos, le sigue la especie Papua con 130 y por último los pinguinos Barbijo con  80. 
 ggplot(pinguinos, aes(especie)) +
   geom_bar() +
-  labs(title = ____,
-       x = ____
-       y = ____)
+  labs(title = "Distribucion pinguinos segun especie",
+       x = "especie",
+       y = "cantidad")
 ```
 
 
 ```{r}
+#' fig.alt: El siguiente gráfico muestra  la Distribucion de pinguinos segun su sexo y la isla que habitan. En todas las islas Biscoe, Dream y Torguensen se muestra una paridad entre hembras y machos.
 ggplot(pinguinos, aes(isla)) +
-  geom_bar(aes(fill = sexo), position = "dodge")
+  geom_bar(aes(fill = sexo), position = "dodge")+
+     labs(title = "Cantidad de pinguinos según sexo y ubicacion",
+        x= "isla",
+        y= "cantidad")
+
+          
+  
 ```
 
 
 Nota: Se puede anotar los valores sobre las barras usando `geom_text()` y `stat = "count"`, pero hay que retocar `position` y `vjust` (ajuste vertical). 
 
 ```{r}
+#' fig.alt:Gráfico de barras que representa el número de pingüinos en diferentes islas, diferenciados por sexo. Las barras se agrupan para cada isla, y el color indica el sexo de los pingüinos. Las etiquetas en la parte superior de cada barra muestran el número de observaciones para cada combinación de isla y sexo.
+
 ggplot(pinguinos, aes(isla)) +
   geom_bar(aes(fill = sexo), position = "dodge") +
   geom_text(aes(group = sexo, label = after_stat(count)),
@@ -43,6 +55,7 @@ ggplot(pinguinos, aes(isla)) +
 
 
 ```{r}
+#' fig.alt: El siguiente gráfico de puntos nos muestra la relacion entre el  largo del pico y alto del pico según cada especie.
 ggplot(pinguinos, aes(largo_pico_mm, alto_pico_mm)) +
   geom_point(aes(color = especie)) +
   geom_smooth(aes(color = especie), method = "lm")
@@ -55,11 +68,14 @@ Descomentá la línea `ggforce::geom_mark_circle(...` y completá el filtro para
 No te olvides de también nombrar los ejes y escribir el texto alternativo!
  
 ```{r}
+
+#fig.alt: "Gráfico de dispersión que muestra la relación entre el PIB per cápita y la esperanza de vida para los países en el año más reciente disponible en los datos. Cada punto representa un país, y la posición en el eje x (PIB per cápita) y en el eje y (esperanza de vida) indica sus valores correspondientes"
+
 paises |> 
   filter(anio == max(anio)) |> 
   ggplot(aes(pib_per_capita, esperanza_de_vida)) +
   geom_point() +
-  # ggforce::geom_mark_circle(aes(filter = ____, label = pais, group = pais)) +
+  # ggforce::geom_mark_circle(aes(filter = rank(-pib_per_capita) <= 5, label = pais, group = pais)) +
   NULL
   
   
