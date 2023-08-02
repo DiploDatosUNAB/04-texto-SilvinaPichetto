@@ -5,11 +5,11 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message = TRUE)
 library(ggplot2)
 library(datos)
 library(dplyr)
-install.packages(ggforce)
+
 ```
 
 
@@ -22,8 +22,8 @@ pinguinos <- datos::pinguinos
 ggplot(pinguinos, aes(especie)) +
   geom_bar() +
   labs(title = "Distribucion pinguinos segun especie",
-       x = "especie",
-       y = "cantidad")
+       x = "Especie",
+       y = "Cantidad")
 ```
 
 
@@ -32,8 +32,8 @@ ggplot(pinguinos, aes(especie)) +
 ggplot(pinguinos, aes(isla)) +
   geom_bar(aes(fill = sexo), position = "dodge")+
      labs(title = "Cantidad de pinguinos según sexo y ubicacion",
-        x= "isla",
-        y= "cantidad")
+        x= "Isla",
+        y= "Cantidad")
 
           
   
@@ -50,7 +50,10 @@ ggplot(pinguinos, aes(isla)) +
   geom_text(aes(group = sexo, label = after_stat(count)),
             stat = "count",
             position = position_dodge(.9), vjust = -0.1,
-            color = "black")
+            color = "black")+
+labs(title = "Cantidad de pinguinos según sexo y ubicacion",
+        x= "Isla",
+        y= "Cantidad")
 ```
 
 
@@ -58,7 +61,10 @@ ggplot(pinguinos, aes(isla)) +
 #' fig.alt: El siguiente gráfico de puntos nos muestra la relacion entre el  largo del pico y alto del pico según cada especie.
 ggplot(pinguinos, aes(largo_pico_mm, alto_pico_mm)) +
   geom_point(aes(color = especie)) +
-  geom_smooth(aes(color = especie), method = "lm")
+  geom_smooth(aes(color = especie), method = "lm")+
+  labs(title = "Relacion entre largo del pico y alto del pico",
+        x= "largo de pico en mm",
+        y= "alto de pico en mm")
 ```
  
 
@@ -68,16 +74,42 @@ Descomentá la línea `ggforce::geom_mark_circle(...` y completá el filtro para
 No te olvides de también nombrar los ejes y escribir el texto alternativo!
  
 ```{r}
-
-#fig.alt: "Gráfico de dispersión que muestra la relación entre el PIB per cápita y la esperanza de vida para los países en el año más reciente disponible en los datos. Cada punto representa un país, y la posición en el eje x (PIB per cápita) y en el eje y (esperanza de vida) indica sus valores correspondientes"
-
+#fig.alt: "Gráfico de dispersión que muestra la relación entre el PIB per cápita y la esperanza de vida para los países. Cada punto representa un país, y la posición en el eje x (PIB per cápita) y en el eje y (esperanza de vida) indica sus valores que van desde 40 a más de  80." 
 paises |> 
   filter(anio == max(anio)) |> 
   ggplot(aes(pib_per_capita, esperanza_de_vida)) +
   geom_point() +
-  # ggforce::geom_mark_circle(aes(filter = rank(-pib_per_capita) <= 5, label = pais, group = pais)) +
-  NULL
+    labs(title = "Esperanza de vida y PBI per cápita",
+        x= "PBI per Capita",
+        y= "Esperanza de vida")
   
-  
+```
+```{r}
+outliers <- paises %>%
+  filter(anio == max(anio),
+         pib_per_capita > 9000,
+         esperanza_de_vida < 60)
+```
+
+
+
+
+```{r}
+
+#fig.alt: "Gráfico de dispersión que muestra la relación entre el PIB per cápita y la esperanza de vida para los países. Cada punto representa un país, y la posición en el eje x (PIB per cápita) y en el eje y (esperanza de vida) indica sus valores que van desde 40 a más de  80.Donde se resalta con un circulos los países con menor esperanza de vida, llamados outliers"
+
+paises %>%
+  filter(anio == max(anio)) %>%
+  ggplot(aes(pib_per_capita, esperanza_de_vida)) +
+  geom_point() +
+  geom_point(aes(color = esperanza_de_vida))+
+  ggforce::geom_mark_circle(aes(filter = pib_per_capita > 9000 & esperanza_de_vida < 60, label = pais, group = pais)) +
+  labs(x = "PBI per capita", y = "Esperanza de Vida") +
+  geom_text(data = outliers, aes(label = pais), x = 1000, y = -3)+
+     labs(title = "Paises Outliers con menor esperanza de vida ",
+        x= "PBI per capita",
+        y= "Esperanza de vida")
+
+
 ```
 
